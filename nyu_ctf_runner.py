@@ -70,14 +70,15 @@ def check_gpu():
         log("⚠️", "KHÔNG CÓ GPU — sẽ cực chậm!", "bold red")
 
 # ═══════════════════════════════════════════════════════════════
-#  PHẦN 4: TẢI MÔ HÌNH QWEN 3.5-9B (AWQ 4-BIT, PUBLIC)
+#  PHẦN 4: TẢI MÔ HÌNH QWEN 2.5-7B (AWQ 4-BIT CHÍNH CHỦ)
 # ═══════════════════════════════════════════════════════════════
 
 def load_model():
-    header("Bước 2: Tải Mô Hình", "QuantTrio/Qwen3.5-9B-AWQ — Lượng tử hóa sẵn 4-bit (~5GB)")
+    header("Bước 2: Tải Mô Hình", "Qwen/Qwen2.5-7B-Instruct-AWQ — Hàng chính chủ siêu nhẹ (~5GB)")
 
     from transformers import AutoModelForCausalLM, AutoTokenizer
-    model_id = "QuantTrio/Qwen3.5-9B-AWQ"
+    # Sử dụng bản chính chủ của Qwen, file chuẩn, không lo lỗi kiến trúc
+    model_id = "Qwen/Qwen2.5-7B-Instruct-AWQ"
 
     log("📦", f"Đang tải [magenta]{model_id}[/magenta] ...")
 
