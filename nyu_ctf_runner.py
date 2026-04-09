@@ -40,6 +40,20 @@ def log(icon: str, msg: str, style: str = ""):
 def setup_environment():
     print_header("Bước 1: Khởi tạo Hệ thống", "Chuẩn bị môi trường & kiểm tra phần cứng")
 
+    # Đăng nhập HuggingFace nếu có file token (không bắt buộc cho model public)
+    token_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "hf_token.txt")
+    if os.path.exists(token_path):
+        token = open(token_path).read().strip()
+        os.environ["HF_TOKEN"] = token
+        try:
+            from huggingface_hub import login
+            login(token=token, add_to_git_credential=False)
+            log("🔑", "Đăng nhập HuggingFace thành công!", "green")
+        except Exception:
+            log("🔑", "Token được nạp vào biến môi trường HF_TOKEN.", "green")
+    else:
+        log("ℹ️", "Không tìm thấy hf_token.txt — dùng chế độ ẩn danh (đủ cho model public).", "dim")
+
     # Kiểm tra GPU
     if torch.cuda.is_available():
         gpu_name = torch.cuda.get_device_name(0)
@@ -66,51 +80,29 @@ def setup_environment():
         log("✅", "Đã có đủ thư viện.", "green")
 
 # ═══════════════════════════════════════════════════════════════
-#  BƯỚC 2: TẢI MÔ HÌNH (AWQ — Lượng tử hóa sẵn, tải nhanh)
+#  BƯỚC 2: TẢI MÔ HÌNH (AWQ Pre-Quantized — Public, ~5GB)
 # ═══════════════════════════════════════════════════════════════
 
 def load_qwen_model():
-    print_header("Bước 2: Tải Mô Hình Sát Thủ", "Qwen3.5-9B-Instruct — AWQ INT4 (Chỉ ~5GB)")
+    print_header("Bước 2: Tải Mô Hình Sát Thủ", "Qwen3.5-9B AWQ 4-bit — Đã lượng tử hóa sẵn (~5GB)")
 
-    # Ưu tiên bản AWQ chính thức hoặc cộng đồng uy tín
-    # Nếu bản AWQ chưa có hoặc lỗi, fallback sang bitsandbytes
-    model_id_awq = "Qwen/Qwen3.5-9B-Instruct-AWQ"
-    model_id_fallback = "Qwen/Qwen3.5-9B-Instruct"
+    # Bản AWQ public từ cộng đồng — 334K+ lượt tải, không cần token
+    model_id = "QuantTrio/Qwen3.5-9B-AWQ"
 
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
-    log("🔍", f"Thử tải bản AWQ pre-quantized: [magenta]{model_id_awq}[/magenta]")
+    log("📦", f"Tải bản lượng tử hóa sẵn: [magenta]{model_id}[/magenta] (Public, không cần xin phép)")
 
-    try:
-        with console.status("[yellow]Kéo mô hình AWQ 4-bit (~5GB — Chờ 30-60 giây)...", spinner="dots"):
-            tokenizer = AutoTokenizer.from_pretrained(model_id_awq, trust_remote_code=True)
-            model = AutoModelForCausalLM.from_pretrained(
-                model_id_awq,
-                device_map="auto",
-                torch_dtype=torch.float16,
-                trust_remote_code=True
-            )
-        log("✅", f"Nạp thành công bản AWQ: [bold green]{model_id_awq}[/bold green]", "green")
-
-    except Exception as e:
-        log("⚠️", f"AWQ không khả dụng ({type(e).__name__}). Chuyển sang bitsandbytes...", "yellow")
-
-        from transformers import BitsAndBytesConfig
-        quantization_config = BitsAndBytesConfig(
-            load_in_4bit=True,
-            bnb_4bit_compute_dtype=torch.float16,
-            bnb_4bit_use_double_quant=True,
-            bnb_4bit_quant_type="nf4"
+    with console.status("[yellow]Kéo mô hình AWQ 4-bit (~5GB — Chờ 30-60 giây)...", spinner="dots"):
+        tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
+        model = AutoModelForCausalLM.from_pretrained(
+            model_id,
+            device_map="auto",
+            torch_dtype=torch.float16,
+            trust_remote_code=True
         )
-        with console.status("[yellow]Kéo mô hình gốc + nén 4-bit tại chỗ (chậm hơn, ~3 phút)...", spinner="dots"):
-            tokenizer = AutoTokenizer.from_pretrained(model_id_fallback, trust_remote_code=True)
-            model = AutoModelForCausalLM.from_pretrained(
-                model_id_fallback,
-                device_map="auto",
-                quantization_config=quantization_config,
-                trust_remote_code=True
-            )
-        log("✅", f"Fallback thành công: [green]{model_id_fallback}[/green] (bitsandbytes 4-bit)", "green")
+
+    log("✅", f"Nạp thành công: [bold green]{model_id}[/bold green]", "green")
 
     # Hiển thị VRAM sau khi nạp
     if torch.cuda.is_available():

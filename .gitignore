@@ -11,3 +11,5 @@ venv.bak/
 
 # Project specific
 *copy.py
+hf_token.txt
+push_to_github.bat
