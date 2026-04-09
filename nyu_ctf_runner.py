@@ -85,7 +85,7 @@ def load_model():
     log("✅", "Tokenizer OK", "green")
 
     model = AutoModelForCausalLM.from_pretrained(
-        model_id, device_map="auto",
+        model_id, device_map="cuda",
         torch_dtype=torch.float16, trust_remote_code=True
     )
     log("✅", f"Model nạp xong: [bold green]{model_id}[/bold green]", "green")
