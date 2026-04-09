@@ -19,7 +19,7 @@ print("=" * 60)
 # Nâng cấp transformers LÊN BẢN MỚI NHẤT ổn định (KHÔNG phải git source)
 # Bản pip ổn định từ tháng 3/2026+ đã hỗ trợ kiến trúc qwen3_5
 subprocess.run([sys.executable, "-m", "pip", "install", "-U",
-                "transformers", "accelerate", "optimum", "auto-gptq", "rich", "hf_transfer"])
+                "transformers", "accelerate", "bitsandbytes", "rich", "hf_transfer"])
 
 print("\n✅ CÀI ĐẶT XONG!\n")
 
@@ -70,24 +70,33 @@ def check_gpu():
         log("⚠️", "KHÔNG CÓ GPU — sẽ cực chậm!", "bold red")
 
 # ═══════════════════════════════════════════════════════════════
-#  PHẦN 4: TẢI MÔ HÌNH QWEN 3.5-9B (GPTQ 4-BIT)
+#  PHẦN 4: TẢI MÔ HÌNH QWEN 3.5-9B (BẢN GỐC + ÉP NÉN 4-BIT)
 # ═══════════════════════════════════════════════════════════════
 
 def load_model():
-    header("Bước 2: Tải Mô Hình", "mssfj/Qwen3.5-9B-GPTQ-INT4 — KIÊN QUYẾT DÙNG 3.5 9B!")
+    header("Bước 2: Tải Mô Hình", "Qwen/Qwen3.5-9B-Instruct — BẢN GỐC ALIBABA (ép nén 4-bit chống tràn RAM)")
 
-    from transformers import AutoModelForCausalLM, AutoTokenizer
-    # Bản GPTQ thuần văn bản của Qwen 3.5 9B để thay thế bản AWQ lỗi trước đó
-    model_id = "mssfj/Qwen3.5-9B-GPTQ-INT4"
+    from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+    # Lấy hẳn bản GỐC của Alibaba để đảm bảo ĐÚNG code kiến trúc (tránh lỗi KeyError)
+    model_id = "Qwen/Qwen3.5-9B-Instruct"
 
     log("📦", f"Đang tải [magenta]{model_id}[/magenta] ...")
 
     tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
     log("✅", "Tokenizer OK", "green")
 
+    # Ép nén 4-bit ngay lúc nạp để mô hình 18GB nhét vừa vô thân hình 5GB của T4
+    qconfig = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_compute_dtype=torch.float16,
+        bnb_4bit_use_double_quant=True,
+        bnb_4bit_quant_type="nf4"
+    )
+
     model = AutoModelForCausalLM.from_pretrained(
         model_id, device_map="cuda",
-        torch_dtype=torch.float16, trust_remote_code=True
+        quantization_config=qconfig, 
+        trust_remote_code=True
     )
     log("✅", f"Model nạp xong: [bold green]{model_id}[/bold green]", "green")
 
