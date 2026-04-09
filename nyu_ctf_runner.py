@@ -115,18 +115,18 @@ def get_challenges():
     chals = [
         {
             "id": "2023q-web-sqli", "category": "web", "name": "Super Secure Login",
-            "desc": "I built a super secure login page for my blog. I heard SQL injection is impossible to exploit nowadays. Can you prove me wrong? The target runs a PHP/MySQL login form. The flag format is flag{...}",
-            "flag": "flag{bl1nd_SQL_1nj3ct10n_2026}"
+            "desc": "The server runs this PHP code: `SELECT * FROM users WHERE username = 'admin' AND password = '$password'`. You need to bypass the password check. What is the most standard, shortest 9-character SQL injection payload for the password field? (e.g. starting with apostrophe). Output the exact payload wrapped in flag{payload}.",
+            "flag": "flag{' OR 1=1;--}"
         },
         {
             "id": "2022f-crypto-rsa", "category": "crypto", "name": "Weak RSA",
-            "desc": "I found this RSA public key: n=323, e=5. The ciphertext is c=34. Can you decrypt the message? The flag is the plaintext integer wrapped as flag{plaintext}.",
+            "desc": "I found this RSA public key: n=323, e=5. The ciphertext is c=34. Can you decrypt the message? Format the plaintext integer wrapped as flag{plaintext}.",
             "flag": "flag{2}"
         },
         {
             "id": "2023q-misc-b64", "category": "misc", "name": "Layers of Encoding",
-            "desc": "I encoded my secret 3 times with Base64. The result is 'Wm14aFozdz0='. What is the original plaintext? Flag format: flag{plaintext}.",
-            "flag": "flag{hi}",
+            "desc": "I encoded my secret 3 times with Base64. The final result is 'WVVkclBRPT0='. What is the original plaintext? Flag format: flag{plaintext}.",
+            "flag": "flag{hi}"
         }
     ]
     t = Table(title="🎯 Danh Sách Mục Tiêu", style="cyan")
@@ -150,9 +150,10 @@ def attack(llm, chal, max_rounds=3):
         log("🔄", f"Vòng {r}/{max_rounds}", "bold yellow")
         
         with console.status("[magenta]AI đang chẻ code...", spinner="bouncingBar"):
+            # Tăng max_tokens lên 2048 để AI đủ sức tuôn ra chuỗi <think> logic thay vì bị ngắt cái rụp
             out = llm.create_chat_completion(
                 messages=messages,
-                max_tokens=256,
+                max_tokens=2048,
                 temperature=0.6,
                 top_p=0.9
             )
