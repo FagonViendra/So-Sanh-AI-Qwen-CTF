@@ -5,7 +5,7 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from rich.console import Console
 from rich.panel import Panel
-from rich.progress import Progress, SpinnerColumn, TextColumn
+
 from rich.text import Text
 from rich.table import Table
 
@@ -38,12 +38,11 @@ def setup_environment():
     print_header("Bước 1: Khởi tạo Hệ thống", "Chuẩn bị môi trường & cài đặt NYU CTF Bench")
     check_gpu()
     
-    with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}"), console=console) as progress:
-        task1 = progress.add_task("[yellow]Đang tải nyuctf (dataset)...", total=None)
+    with console.status("[yellow]Đang tải nyuctf (dataset)...", spinner="dots"):
         # Giả lập cài đặt (Nếu ở Colab, bỏ comment dòng os.system bên dưới)
         # os.system("pip install -q nyuctf bitsandbytes accelerate")
         time.sleep(1) # Fake loading
-        progress.update(task1, completed=True, description="[green]✓ Thư viện chuẩn bị xong!")
+    console.print("[green]✓ Thư viện chuẩn bị xong!")
 
 def load_qwen_model():
     """Tải siêu sát thủ Qwen 3.5 9B vào VRAM với 4-bit Lượng tử hóa"""
@@ -72,10 +71,9 @@ def load_qwen_model():
     return tokenizer, model
     """
     
-    with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}"), console=console) as progress:
-        task = progress.add_task("[yellow]Kéo weights từ HuggingFace (VRAM ~5.5GB)...", total=None)
+    with console.status("[yellow]Kéo weights từ HuggingFace (VRAM ~5.5GB)...", spinner="dots"):
         time.sleep(2) # Giả lập tải mô hình
-        progress.update(task, completed=True, description="[green]✓ Mô hình vũ trang thành công!")
+    console.print("[green]✓ Mô hình vũ trang thành công!")
         
     return None, None # Giả lập trả về
 
