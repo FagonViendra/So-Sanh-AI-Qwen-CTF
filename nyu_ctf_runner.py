@@ -40,20 +40,6 @@ def log(icon: str, msg: str, style: str = ""):
 def setup_environment():
     print_header("Bước 1: Khởi tạo Hệ thống", "Chuẩn bị môi trường & kiểm tra phần cứng")
 
-    # Đăng nhập HuggingFace nếu có file token (không bắt buộc cho model public)
-    token_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "hf_token.txt")
-    if os.path.exists(token_path):
-        token = open(token_path).read().strip()
-        os.environ["HF_TOKEN"] = token
-        try:
-            from huggingface_hub import login
-            login(token=token, add_to_git_credential=False)
-            log("🔑", "Đăng nhập HuggingFace thành công!", "green")
-        except Exception:
-            log("🔑", "Token được nạp vào biến môi trường HF_TOKEN.", "green")
-    else:
-        log("ℹ️", "Không tìm thấy hf_token.txt — dùng chế độ ẩn danh (đủ cho model public).", "dim")
-
     # Kiểm tra GPU
     if torch.cuda.is_available():
         gpu_name = torch.cuda.get_device_name(0)
