@@ -56,7 +56,7 @@ def find_and_download_qwen_gguf():
     api = HfApi()
     log("🔍", "Đang quét mạng HuggingFace tìm bản Qwen3.5-9B GGUF tốt nhất...")
     # Tìm kiếm các file gguf của Qwen 3.5 9B theo lượt tải
-    models = api.list_models(search="Qwen3.5-9B GGUF", sort="downloads", direction=-1, limit=5)
+    models = api.list_models(search="Qwen3.5-9B GGUF", sort="downloads", limit=5)
     models_list = list(models)
     
     if not models_list:
