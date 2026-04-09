@@ -70,10 +70,13 @@ def find_and_download_qwen_gguf():
     filename = "*Q4_K_M.gguf"
     log("📦", f"Đang kéo file {filename} từ HuggingFace (Tốc độ tối đa)...")
     
-    model_path = hf_hub_download(repo_id=repo_id, filename="", allow_patterns=filename)
+    from huggingface_hub import snapshot_download
+    import glob
+    model_path = snapshot_download(repo_id=repo_id, allow_patterns=[filename])
     
-    # Path trả về là thư mục, lục tìm file *.gguf thật
-    true_path = [os.path.join(model_path, f) for f in os.listdir(model_path) if f.endswith(".gguf")][0]
+    # Lục tìm file *.gguf thật qua glob
+    ggufs = glob.glob(os.path.join(model_path, "**", "*.gguf"), recursive=True)
+    true_path = ggufs[0]
     log("✅", f"Tải xong tại lệnh: {true_path}", "green")
     
     return true_path
