@@ -19,7 +19,7 @@ print("=" * 60)
 # Nâng cấp transformers LÊN BẢN MỚI NHẤT ổn định (KHÔNG phải git source)
 # Bản pip ổn định từ tháng 3/2026+ đã hỗ trợ kiến trúc qwen3_5
 subprocess.run([sys.executable, "-m", "pip", "install", "-U",
-                "transformers", "accelerate", "autoawq", "rich", "hf_transfer"])
+                "transformers", "accelerate", "optimum", "auto-gptq", "rich", "hf_transfer"])
 
 print("\n✅ CÀI ĐẶT XONG!\n")
 
@@ -70,15 +70,15 @@ def check_gpu():
         log("⚠️", "KHÔNG CÓ GPU — sẽ cực chậm!", "bold red")
 
 # ═══════════════════════════════════════════════════════════════
-#  PHẦN 4: TẢI MÔ HÌNH QWEN 2.5-7B (AWQ 4-BIT CHÍNH CHỦ)
+#  PHẦN 4: TẢI MÔ HÌNH QWEN 3.5-9B (GPTQ 4-BIT)
 # ═══════════════════════════════════════════════════════════════
 
 def load_model():
-    header("Bước 2: Tải Mô Hình", "Qwen/Qwen2.5-7B-Instruct-AWQ — Hàng chính chủ siêu nhẹ (~5GB)")
+    header("Bước 2: Tải Mô Hình", "mssfj/Qwen3.5-9B-GPTQ-INT4 — KIÊN QUYẾT DÙNG 3.5 9B!")
 
     from transformers import AutoModelForCausalLM, AutoTokenizer
-    # Sử dụng bản chính chủ của Qwen, file chuẩn, không lo lỗi kiến trúc
-    model_id = "Qwen/Qwen2.5-7B-Instruct-AWQ"
+    # Bản GPTQ thuần văn bản của Qwen 3.5 9B để thay thế bản AWQ lỗi trước đó
+    model_id = "mssfj/Qwen3.5-9B-GPTQ-INT4"
 
     log("📦", f"Đang tải [magenta]{model_id}[/magenta] ...")
 
