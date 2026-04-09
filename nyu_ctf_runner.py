@@ -43,8 +43,8 @@ def setup_environment():
     check_gpu()
 
 def load_qwen_model():
-    print_header("Bước 2: Tải Mô Hình Sát Thủ", "Qwen/Qwen2.5-7B-Instruct (Quantization 4-bit)")
-    model_id = "Qwen/Qwen2.5-7B-Instruct"
+    print_header("Bước 2: Tải Mô Hình Sát Thủ", "Qwen/Qwen3.5-9B-Instruct (Quantization 4-bit NF4)")
+    model_id = "Qwen/Qwen3.5-9B-Instruct"
     
     from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
     
