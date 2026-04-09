@@ -164,7 +164,8 @@ def attack(tokenizer, model, chal, max_rounds=3):
                 pad_token_id=tokenizer.eos_token_id, do_sample=True,
             )
         resp = tokenizer.decode(out[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True).strip()
-        log("🤖", f"AI: [cyan]{resp[:200]}[/cyan]")
+        log("🤖", f"AI trả lời:")
+        console.print(Panel(resp, border_style="cyan", expand=True))
 
         # Chấm flag
         found = re.findall(r"flag\{[^}]+\}", resp)
