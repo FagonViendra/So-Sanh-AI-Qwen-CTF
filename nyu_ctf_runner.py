@@ -92,7 +92,7 @@ def load_llama(model_path):
         llm = Llama(
             model_path=model_path,
             n_gpu_layers=-1,        # -1 = đẩy 100% layers lên GPU (Tesla T4 bao mượt)
-            n_ctx=4096,             # Context lớn 4096 cho CTF
+            n_ctx=8192,             # Tối đa hóa Context lên 8K cho CTF
             verbose=False,          # Tắt tiếng spam của Llama.cpp
             chat_format="chatml"    # Chuẩn hội thoại của Qwen
         )
@@ -153,9 +153,9 @@ def attack(llm, chal, max_rounds=3):
             # Tăng max_tokens lên 2048 để AI đủ sức tuôn ra chuỗi <think> logic thay vì bị ngắt cái rụp
             out = llm.create_chat_completion(
                 messages=messages,
-                max_tokens=2048,
-                temperature=0.6,
-                top_p=0.9
+                max_tokens=8192,      # Token tối đa theo n_ctx để không bao giờ bị cắt 
+                temperature=0.6,      # Theo tài liệu Qwen, Reasoning Model nên để temp=0.6
+                top_p=0.95            # Nucleus sampling mở rộng cho suy luận phân nhánh
             )
         
         resp = out["choices"][0]["message"]["content"].strip()
