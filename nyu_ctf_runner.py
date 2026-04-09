@@ -19,15 +19,20 @@ print("=" * 60)
 # Nâng cấp transformers LÊN BẢN MỚI NHẤT ổn định (KHÔNG phải git source)
 # Bản pip ổn định từ tháng 3/2026+ đã hỗ trợ kiến trúc qwen3_5
 subprocess.run([sys.executable, "-m", "pip", "install", "-U",
-                "transformers", "accelerate", "autoawq", "rich"])
+                "transformers", "accelerate", "autoawq", "rich", "hf_transfer"])
 
 print("\n✅ CÀI ĐẶT XONG!\n")
 
 # ═══════════════════════════════════════════════════════════════
-#  PHẦN 2: IMPORT (SAU KHI CÀI)
+#  PHẦN 2: IMPORT (SAU KHI CÀI) & CẤU HÌNH TẢI SIÊU TỐC
 # ═══════════════════════════════════════════════════════════════
 
 import os, time, re, torch
+
+# ===== BẬT TÍNH NĂNG TẢI ĐA LUỒNG SIÊU TỐC CỦA HUGGINGFACE =====
+os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
+# ================================================================
+
 from datetime import datetime
 from rich.console import Console
 from rich.panel import Panel
